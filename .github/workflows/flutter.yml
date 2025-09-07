@@ -1,0 +1,48 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Flutter 3.9.2
+        run: |
+          git clone https://github.com/flutter/flutter.git /tmp/flutter
+          cd /tmp/flutter
+          git checkout 3.9.2
+          export PATH="$PWD/bin:$PATH"
+          flutter doctor
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run analyzer
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: biscoito-da-sorte-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 90
+
+      - name: Create GitHub Release and Upload APK
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: build/app/outputs/flutter-apk/app-release.apk
+          tag: ${{ github.sha }}
