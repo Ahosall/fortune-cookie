@@ -11,16 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install Flutter 3.9.2
-        run: |
-          git clone https://github.com/flutter/flutter.git /tmp/flutter
-          cd /tmp/flutter
-          git checkout 3.9.2
-          export PATH="$PWD/bin:$PATH"
-          flutter doctor
+      - name: Clone repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
 
       - name: Install dependencies
         run: flutter pub get
